@@ -269,9 +269,9 @@ tmux_conf_theme_right_separator_sub='\uE0B3'  # powerline thin
 #     - #{uptime_s}
 #     - #{username}
 #     - #{username_ssh}
-tmux_conf_theme_status_left=" ❐ #S "
+tmux_conf_theme_status_left="  #S "
 #tmux_conf_theme_status_left=" ❐ #S | ↑#{?uptime_y, #{uptime_y}y,}#{?uptime_d, #{uptime_d}d,}#{?uptime_h, #{uptime_h}h,}#{?uptime_m, #{uptime_m}m,} | #{pretty_pane_current_path} "
-tmux_conf_theme_status_right=" #{prefix}#{mouse}#{pairing}#{synchronized}#{?battery_percentage, #{battery_percentage},} | %R , %d %b | #{username}@#{hostname} "
+tmux_conf_theme_status_right=" #{prefix}#{mouse}#{pairing}#{synchronized}#{?battery_percentage,#{battery_status}#{battery_percentage} ,} |  %H:%M ,  %d %b |  #{username}@#{hostname} "
 
 # status left style
 tmux_conf_theme_status_left_fg="$tmux_conf_theme_colour_6,$tmux_conf_theme_colour_7,$tmux_conf_theme_colour_8"
@@ -409,7 +409,10 @@ bind - split-window -v
 bind | split-window -h
 
 # reload config with prefix + r
-bind r source-file ~/.tmux.conf \; display "Reloaded"
+# (No custom binding needed: the framework already binds prefix+r to source
+# $TMUX_CONF, which resolves to the XDG path ~/.config/tmux/tmux.conf. A
+# hardcoded "source-file ~/.tmux.conf" here would override it with a path that
+# no longer exists after the move to the XDG location.)
 
 # if you don't want Oh my tmux! to alter a binding or a setting, use #!important
 # bind c new-window -c '#{pane_current_path}' #!important
