@@ -61,8 +61,9 @@ fi
 # PATH
 # ---------------------------------------------------------------------------
 export PATH="$HOME/.local/bin:$PATH"
-# Add the current directory to PYTHONPATH (kept from your original setup).
-export PYTHONPATH="${PYTHONPATH:+${PYTHONPATH}:}."
+# Note: the current directory is deliberately NOT added to PYTHONPATH. Putting
+# "." there lets any directory you cd into inject Python modules. If a specific
+# project needs it, set PYTHONPATH for that project in ~/.config/zsh/local.zsh.
 
 # ---------------------------------------------------------------------------
 # History + completion (sane defaults)
