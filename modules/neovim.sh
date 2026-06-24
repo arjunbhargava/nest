@@ -35,7 +35,7 @@ install_neovim() {
 
 # Warn if the installed nvim is older than the config requires.
 check_neovim_version() {
-  command -v nvim >/dev/null 2>&1 || return
+  command -v nvim >/dev/null 2>&1 || return 0
   local ver major minor
   ver="$(nvim --version 2>/dev/null | sed -n '1s/.*v\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/p')"
   [[ -z "$ver" ]] && { warn "could not determine neovim version"; return; }

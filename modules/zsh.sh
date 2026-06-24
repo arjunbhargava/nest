@@ -79,8 +79,8 @@ link_zsh_config() {
 # unavailable on ephemeral instances), append a guarded hook to ~/.bashrc that
 # hands interactive logins over to zsh. Idempotent via a marker line.
 setup_bash_handoff() {
-  [[ "$OS" == "linux" ]] || return
-  command -v zsh >/dev/null 2>&1 || return
+  [[ "$OS" == "linux" ]] || return 0
+  command -v zsh >/dev/null 2>&1 || return 0
   local marker="# >>> nest: hand off to zsh >>>"
   local rc="$HOME/.bashrc"
   if [[ -f "$rc" ]] && grep -qF "$marker" "$rc"; then
@@ -101,7 +101,7 @@ EOF
 }
 
 maybe_chsh() {
-  [[ "$DO_CHSH" -eq 1 ]] || return
+  [[ "$DO_CHSH" -eq 1 ]] || return 0
   local zsh_path; zsh_path="$(command -v zsh)" || { warn "zsh not found; cannot chsh"; return; }
   if ! grep -qxF "$zsh_path" /etc/shells 2>/dev/null; then
     log "registering $zsh_path in /etc/shells"
