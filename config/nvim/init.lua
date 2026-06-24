@@ -65,12 +65,14 @@ vim.pack.add({
   { src = 'https://github.com/folke/which-key.nvim' },
   { src = 'https://github.com/NMAC427/guess-indent.nvim' },
   { src = 'https://github.com/MeanderingProgrammer/render-markdown.nvim' },
+  { src = 'https://github.com/sindrets/diffview.nvim' },  -- branch/working-tree diff review
 })
 
 require('mini.pick').setup()        -- fuzzy finder
 require('mini.completion').setup()  -- insert-mode completion
 require('mini.pairs').setup()       -- auto-close brackets/quotes
 require('mini.icons').setup()       -- filetype/glyph icons (used by render-markdown)
+require('mini.icons').mock_nvim_web_devicons()  -- let diffview use mini.icons for file glyphs
 
 -- Colorscheme.
 require('nordic').setup({
@@ -140,6 +142,24 @@ require('gitsigns').setup({
 
 -- Keybinding discovery popup. Shows available mappings as you type a prefix.
 require('which-key').setup({})
+
+-- Diffview: single-tab review UI. Left panel lists every changed file, right
+-- pane shows the diff in native diff mode (live as you edit; the file list
+-- refreshes on save / :DiffviewRefresh). The main tool for tracking what an
+-- agent changed across the tree.
+require('diffview').setup({})
+local function diffview_toggle()
+  if require('diffview.lib').get_current_view() then
+    vim.cmd('DiffviewClose')
+  else
+    vim.cmd('DiffviewOpen')
+  end
+end
+vim.keymap.set('n', '<leader>gd', diffview_toggle,                       { desc = 'Diffview: toggle (working tree)' })
+vim.keymap.set('n', '<leader>gm', '<cmd>DiffviewOpen main...HEAD<CR>',   { desc = 'Diffview: review branch vs main' })
+vim.keymap.set('n', '<leader>gh', '<cmd>DiffviewFileHistory %<CR>',      { desc = 'Diffview: current file history' })
+vim.keymap.set('n', '<leader>gH', '<cmd>DiffviewFileHistory<CR>',        { desc = 'Diffview: repo history' })
+vim.keymap.set('n', '<leader>gc', '<cmd>DiffviewClose<CR>',             { desc = 'Diffview: close' })
 
 -- Completion engine. Pure-Lua fuzzy matcher (no Rust toolchain / prebuilt binary).
 require('blink.cmp').setup({
