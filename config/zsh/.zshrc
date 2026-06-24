@@ -19,11 +19,25 @@ _source_first() {
   return 1
 }
 
-# Resolve Homebrew prefix once (empty string on machines without brew).
-if command -v brew >/dev/null 2>&1; then
+# ---------------------------------------------------------------------------
+# Homebrew: a login shell does not put brew on PATH by itself, so bootstrap it
+# from the known install locations (Apple Silicon, Intel macOS, Linuxbrew)
+# before anything below needs brew-installed tools (nvim, starship, eza, the
+# zsh plugins). brew shellenv prepends bin/sbin to PATH and sets HOMEBREW_*.
+# BREW_PREFIX stays empty on machines without brew.
+# ---------------------------------------------------------------------------
+BREW_PREFIX=""
+for _brew in /opt/homebrew/bin/brew /usr/local/bin/brew /home/linuxbrew/.linuxbrew/bin/brew; do
+  if [[ -x "$_brew" ]]; then
+    eval "$("$_brew" shellenv)"
+    BREW_PREFIX="$HOMEBREW_PREFIX"
+    break
+  fi
+done
+unset _brew
+# Fallback: brew reachable by some other means (already on PATH).
+if [[ -z "$BREW_PREFIX" ]] && command -v brew >/dev/null 2>&1; then
   BREW_PREFIX="$(brew --prefix)"
-else
-  BREW_PREFIX=""
 fi
 
 # ===========================================================================
