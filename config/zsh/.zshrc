@@ -53,6 +53,29 @@ if command -v eza >/dev/null 2>&1; then
   alias la='eza -a  --group-directories-first'
   alias lt='eza --tree --level=2 --group-directories-first'
 fi
+
+# conda env shortcuts
+alias sa='conda activate'
+alias sd='conda deactivate'
+
+# misc
+alias nvi='watch -n.1 nvidia-smi'                          # no-op unless nvidia-smi exists
+alias help='tldr'                                          # needs `tldr`; no-op otherwise
+alias awslogin='aws sso login --profile default --use-device-code'
+
+# killby <pattern>: list matching processes, confirm, then kill -9 them.
+killby() {
+  echo "Matching processes:"
+  ps aux | grep -v grep | grep -i "$1"
+  echo -n "Kill these processes? [y/N] "
+  read -r response
+  if [[ "$response" =~ ^[Yy]$ ]]; then
+    ps aux | grep -v grep | grep -i "$1" | awk '{print $2}' | xargs -r kill -9
+    echo "Processes killed."
+  else
+    echo "Cancelled."
+  fi
+}
 # ===========================================================================
 # <<< END YOUR ALIASES <<<
 # ===========================================================================
