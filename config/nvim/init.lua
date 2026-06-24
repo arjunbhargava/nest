@@ -51,7 +51,7 @@ vim.pack.add({
   { src = 'https://github.com/echasnovski/mini.nvim' },
   { src = 'https://github.com/nvim-lualine/lualine.nvim' },
   { src = 'https://github.com/AlexvZyl/nordic.nvim' },
-  { src = 'https://github.com/nvim-treesitter/nvim-treesitter' },
+  { src = 'https://github.com/nvim-treesitter/nvim-treesitter', version = 'master' },
   { src = 'https://github.com/HiPhish/rainbow-delimiters.nvim' },
   -- LSP + tooling
   { src = 'https://github.com/neovim/nvim-lspconfig' },
@@ -94,17 +94,21 @@ require('lualine').setup({
 })
 
 -- Treesitter: real syntax highlighting (distinct colors per token type).
--- Parsers compile on first install via the tree-sitter CLI. Add languages
--- to the install list as needed; install() is idempotent (skips installed).
-require('nvim-treesitter').install({
-  'python', 'lua', 'typescript', 'javascript', 'tsx', 'rust',
-  'markdown', 'markdown_inline', 'yaml', 'json', 'toml',
-  'bash', 'html', 'css', 'vim', 'vimdoc', 'diff', 'gitcommit',
-})
-vim.api.nvim_create_autocmd('FileType', {
-  callback = function(args)
-    pcall(vim.treesitter.start, args.buf)  -- no-op if no parser for this filetype
-  end,
+-- Pinned to the `master` branch (classic API): parsers compile from grammar
+-- sources with a C compiler (cc/gcc/clang) on first launch. This avoids the
+-- `main` branch's hard dependency on the external tree-sitter CLI, whose only
+-- prebuilt binaries need a very recent glibc. A C compiler is a far more
+-- portable contract (build-essential on Linux, Xcode CLT on macOS).
+-- Add languages to ensure_installed as needed; install is idempotent.
+require('nvim-treesitter.configs').setup({
+  ensure_installed = {
+    'python', 'lua', 'typescript', 'javascript', 'tsx', 'rust',
+    'markdown', 'markdown_inline', 'yaml', 'json', 'toml',
+    'bash', 'html', 'css', 'vim', 'vimdoc', 'diff', 'gitcommit',
+  },
+  auto_install = false,           -- only compile the languages listed above
+  highlight = { enable = true },  -- treesitter-based highlighting
+  indent = { enable = true },     -- treesitter-based '=' indentation
 })
 
 -- In-buffer Markdown rendering: headings, code blocks, lists, tables, and
