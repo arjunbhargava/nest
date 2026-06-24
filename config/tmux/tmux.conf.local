@@ -422,6 +422,14 @@ bind m run "cut -c3- '#{TMUX_CONF}' | sh -s _toggle_mouse" \; display 'mouse #{?
 
 # true color in xterm-256color terminals; complements tmux_conf_24b_colour
 set -ga terminal-overrides ",xterm-256color:Tc"
+# robust 24-bit colour for any TERM (tmux 3.2+), so colours survive over SSH
+# regardless of the remote's terminfo for the outer terminal.
+set -as terminal-features ",*:RGB"
+
+# Let programs inside tmux set the OUTER terminal's clipboard via OSC 52 (e.g.
+# Neovim's OSC 52 yank over SSH). Without this tmux swallows the sequence and a
+# remote yank never reaches your local clipboard.
+set -g set-clipboard on
 
 # extended keys (needed by Pi for Shift/Ctrl+Enter); csi-u format needs tmux >= 3.5
 set -g extended-keys on

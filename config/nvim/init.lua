@@ -15,10 +15,31 @@ vim.o.expandtab = true
 vim.o.shiftwidth = 4
 vim.o.tabstop = 4
 vim.o.confirm = true
+vim.o.termguicolors = true  -- 24-bit colour; required for the theme to look right
 
+-- Use the system clipboard for all yanks/puts.
 vim.api.nvim_create_autocmd('UIEnter', {
   callback = function() vim.o.clipboard = 'unnamedplus' end,
 })
+
+-- Over SSH there is no pbcopy/xsel/wl-copy on the remote box, so route the
+-- system clipboard through OSC 52 escape sequences instead. These are
+-- terminal-agnostic and pass through tmux when 'set-clipboard on' is set, so a
+-- yank in remote Neovim lands in your *local* terminal's clipboard. Paste is
+-- served from the unnamed register (the last yank) to avoid a slow/blocked
+-- terminal round-trip; paste text from elsewhere with your terminal's own
+-- paste (it arrives as a normal keystroke stream). Local (non-SSH) sessions
+-- keep the native provider (pbcopy on macOS), which is faster and supports
+-- paste-back.
+if vim.env.SSH_TTY or vim.env.SSH_CONNECTION then
+  local osc52 = require('vim.ui.clipboard.osc52')
+  local function paste() return vim.split(vim.fn.getreg('"'), '\n') end
+  vim.g.clipboard = {
+    name = 'OSC 52',
+    copy  = { ['+'] = osc52.copy('+'),  ['*'] = osc52.copy('*') },
+    paste = { ['+'] = paste,            ['*'] = paste },
+  }
+end
 vim.api.nvim_create_autocmd('TextYankPost', {
   callback = function() vim.hl.on_yank() end,
 })

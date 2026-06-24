@@ -41,6 +41,15 @@ install_fzf() {
   pkg_install fzf || warn "fzf not installed via $PKG — clone github.com/junegunn/fzf manually"
 }
 
+# mosh: roaming, latency-tolerant SSH replacement. Makes typing over a slow or
+# flaky link to a remote box feel local, and survives IP changes / sleep.
+# Needs a UDP port range open to the host (e.g. an AWS security-group rule).
+install_mosh() {
+  command -v mosh >/dev/null 2>&1 && { log "mosh present"; return; }
+  log "installing mosh"
+  pkg_install mosh || warn "could not install mosh via $PKG — install it manually for roaming SSH"
+}
+
 install_nvm() {
   [[ -s "$HOME/.nvm/nvm.sh" ]] && { log "nvm present"; return; }
   log "installing nvm"
@@ -85,6 +94,7 @@ module_tools() {
   install_font
   install_eza
   install_fzf
+  install_mosh
   install_nvm
 }
 
