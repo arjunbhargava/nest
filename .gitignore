@@ -1,0 +1,6 @@
+# Local, machine-specific files are sourced by .zshrc but must never be
+# committed. They live in ~/.config/zsh/, not in this repo, so this is mostly
+# belt-and-suspenders in case someone copies them in here.
+secrets.zsh
+local.zsh
+*.backup.*

@@ -1,0 +1,63 @@
+# ~/.config/starship.toml
+add_newline = true
+command_timeout = 1000   # ms; snappy over SSH and in big repos
+
+format = """
+$directory\
+$git_branch\
+$git_status\
+$git_state\
+$python\
+$nodejs\
+$rust\
+$cmd_duration\
+$line_break\
+$character"""
+
+[directory]
+truncation_length = 3
+truncate_to_repo = true
+style = "bold cyan"
+
+[git_branch]
+symbol = " "
+style = "bold purple"
+format = '[$symbol$branch]($style) '
+
+[git_status]
+style = "bold red"
+ahead = "⇡${count}"
+behind = "⇣${count}"
+diverged = "⇕⇡${ahead_count}⇣${behind_count}"
+modified = "!${count}"
+staged = "+${count}"
+untracked = "?${count}"
+stashed = "≡${count}"
+conflicted = "✗${count}"
+
+[git_state]
+style = "bold yellow"
+
+[python]
+symbol = " "
+style = "bold yellow"
+format = '[$symbol$version( \($virtualenv\))]($style) '
+
+[nodejs]
+symbol = " "
+style = "bold green"
+detect_extensions = ["ts", "tsx", "js", "mjs", "cjs", "jsx"]
+detect_files = ["package.json", "tsconfig.json", ".nvmrc"]
+
+[rust]
+symbol = " "
+style = "bold red"
+
+[cmd_duration]
+min_time = 2000
+style = "italic yellow"
+format = "took [$duration]($style) "
+
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"

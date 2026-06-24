@@ -1,0 +1,13 @@
+# ~/.config/zsh/local.zsh
+# ---------------------------------------------------------------------------
+# LOCAL ONLY. Per-machine, non-secret customization that should NOT be the
+# same everywhere (so it does not belong in the versioned .zshrc aliases block).
+#
+# Examples:
+#   export EDITOR="nvim"
+#   export PATH="$HOME/some/machine/specific/bin:$PATH"
+#   alias gpu='nvidia-smi'
+#   alias work='cd ~/Projects/that-one-repo'
+#
+# Portable aliases you want on EVERY machine go in the ">>> YOUR ALIASES <<<"
+# block in ~/my-env/home/.zshrc instead, so they get versioned.
