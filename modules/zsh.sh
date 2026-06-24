@@ -3,8 +3,8 @@
 # .zshrc, the local secrets/local.zsh seeds, and the mechanism that lands you
 # in zsh after an SSH login (bash handoff on Linux, optional chsh).
 #
-# zsh has no XDG auto-discovery, so a one-line ~/.zshenv (home/.zshenv) sets
-# ZDOTDIR=~/.config/zsh; the real .zshrc (config/zsh/.zshrc) and the private
+# zsh has no XDG auto-discovery, so a one-line ~/.zshenv (config/zsh/zshenv)
+# sets ZDOTDIR=~/.config/zsh; the real .zshrc (config/zsh/.zshrc) and the private
 # secrets.zsh / local.zsh all live under ~/.config/zsh.
 #
 # Run standalone:  ./modules/zsh.sh [--chsh]
@@ -49,7 +49,7 @@ link_zsh_config() {
   # ~/.zshenv points ZDOTDIR at ~/.config/zsh; retire any legacy real ~/.zshrc
   # so it can't shadow the relocated config (harmless once ZDOTDIR is set, but
   # we keep $HOME clean).
-  link_file "$REPO_DIR/home/.zshenv" "$HOME/.zshenv"
+  link_file "$REPO_DIR/config/zsh/zshenv" "$HOME/.zshenv"
   if [[ -e "$HOME/.zshrc" && ! -L "$HOME/.zshrc" ]]; then
     local backup="$HOME/.zshrc.backup.$(date +%Y%m%d%H%M%S)"
     warn "retiring legacy ~/.zshrc -> $backup"
@@ -81,7 +81,7 @@ link_zsh_config() {
 setup_bash_handoff() {
   [[ "$OS" == "linux" ]] || return
   command -v zsh >/dev/null 2>&1 || return
-  local marker="# >>> my-env: hand off to zsh >>>"
+  local marker="# >>> nest: hand off to zsh >>>"
   local rc="$HOME/.bashrc"
   if [[ -f "$rc" ]] && grep -qF "$marker" "$rc"; then
     log "bash->zsh handoff already present in ~/.bashrc"
@@ -96,7 +96,7 @@ if [ -t 1 ] && command -v zsh >/dev/null 2>&1 && [ -z "\$ZSH_VERSION" ]; then
   export SHELL="\$(command -v zsh)"
   exec zsh -l
 fi
-# <<< my-env: hand off to zsh <<<
+# <<< nest: hand off to zsh <<<
 EOF
 }
 

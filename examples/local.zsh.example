@@ -10,4 +10,4 @@
 #   alias work='cd ~/Projects/that-one-repo'
 #
 # Portable aliases you want on EVERY machine go in the ">>> YOUR ALIASES <<<"
-# block in ~/my-env/home/.zshrc instead, so they get versioned.
+# block in ~/nest/config/zsh/.zshrc instead, so they get versioned.

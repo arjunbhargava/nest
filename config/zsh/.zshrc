@@ -1,5 +1,5 @@
 #!/usr/bin/env zsh
-# Portable .zshrc — managed by ~/my-env (https://github.com/<you>/my-env)
+# Portable .zshrc — managed by ~/nest (https://github.com/<you>/nest)
 # Works on macOS (Homebrew) and Linux (apt/dnf/pacman + ~/.zsh/plugins).
 # Edit the clearly-marked sections below for your own aliases; put machine-
 # specific values and secrets in the local files sourced at the very end.
@@ -27,7 +27,7 @@ else
 fi
 
 # ===========================================================================
-# >>> YOUR ALIASES <<<  (portable; versioned in ~/my-env)
+# >>> YOUR ALIASES <<<  (portable; versioned in ~/nest)
 # Add aliases you want on every machine here.
 # ===========================================================================
 alias l='ls -alh'

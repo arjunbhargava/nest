@@ -1,0 +1,7 @@
+#!/usr/bin/env zsh
+# ~/.zshenv — read by zsh on EVERY invocation, before ~/.zshrc.
+# zsh has no XDG auto-discovery: left alone it reads ~/.zshrc straight from
+# $HOME. This stub's only job is to point zsh at the real config directory so
+# the rest of the shell setup can live under ~/.config/zsh.
+# Symlinked from config/zsh/zshenv in the nest repo; do not put secrets here.
+export ZDOTDIR="$HOME/.config/zsh"

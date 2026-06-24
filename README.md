@@ -1,4 +1,4 @@
-# my-env
+# nest
 
 This repository is a saved copy of a complete terminal and text-editor setup.
 Run one command on a new computer and it will look and behave exactly like the
@@ -61,16 +61,16 @@ command on <https://brew.sh>, then come back here.
 ### Step 1 — Download this setup onto the computer
 
 Copy and paste this into your terminal. It puts the files in a folder called
-`my-env` inside your home directory, then moves you into that folder.
+`nest` inside your home directory, then moves you into that folder.
 
 ```sh
-git clone <your-repo-url> ~/my-env
-cd ~/my-env
+git clone <your-repo-url> ~/nest
+cd ~/nest
 ```
 
 Replace `<your-repo-url>` with the address of your copy of this repository. If
 the files are already on the machine (for example you copied them by hand),
-just run `cd ~/my-env`.
+just run `cd ~/nest`.
 
 ### Step 2 — Run the installer
 
@@ -161,9 +161,9 @@ Yes, and here is exactly how it avoids surprises:
   `~/.zshrc` or `~/.zshenv`, the installer first renames it to
   `<name>.backup.<date>` so you can get it back, then puts the new one in place.
 - **It does not copy files; it links them.** Your settings live in this
-  `my-env` folder. The installer creates a "symlink" (a shortcut) from the
+  `nest` folder. The installer creates a "symlink" (a shortcut) from the
   place each tool looks (e.g. `~/.config/zsh/.zshrc`) back to the file in
-  `my-env`. This
+  `nest`. This
   means when you edit a setting later, you edit it in one place and it is
   already saved with the rest of your setup.
 - **It skips anything already installed**, so re-running it is cheap and safe.
@@ -173,13 +173,13 @@ Yes, and here is exactly how it avoids surprises:
 
 ## How your settings are wired up (the flow)
 
-Every configuration file lives in this `my-env` folder. The installer creates a
+Every configuration file lives in this `nest` folder. The installer creates a
 symlink from the place each tool looks, back to the file here. Most tools read
 from an obvious location; two need a small redirect, explained below.
 
 | File in this repo | Symlinked to | How the tool finds it |
 |---|---|---|
-| `home/.zshenv` | `~/.zshenv` | zsh **always** reads `~/.zshenv` first; this stub sets `ZDOTDIR=~/.config/zsh` so the rest of the shell config is found there |
+| `config/zsh/zshenv` | `~/.zshenv` | zsh **always** reads `~/.zshenv` first; this stub sets `ZDOTDIR=~/.config/zsh` so the rest of the shell config is found there |
 | `config/zsh/.zshrc` | `~/.config/zsh/.zshrc` | zsh reads `$ZDOTDIR/.zshrc` (i.e. this file) once `ZDOTDIR` is set above |
 | `config/starship/starship.toml` | `~/.config/starship/starship.toml` | `.zshrc` exports `STARSHIP_CONFIG` pointing at this path |
 | `config/nvim/` | `~/.config/nvim` | Neovim's standard config directory |
@@ -258,11 +258,11 @@ Nerd Font on your own computer, not on every server you connect to.
 To pull in newer settings or tools, just run the installer again:
 
 ```sh
-cd ~/my-env
+cd ~/nest
 ./install.sh
 ```
 
-Because everything is linked rather than copied, editing a file in `my-env`
+Because everything is linked rather than copied, editing a file in `nest`
 updates your live setup right away — no reinstall needed for your own tweaks.
 
 ---
@@ -324,7 +324,7 @@ restart with `tmux kill-server` and reopen.
   mv ~/.zshrc.backup.20260624153000  ~/.zshrc     # use your actual backup name
   mv ~/.zshenv.backup.20260624153000 ~/.zshenv    # (this one may hold old keys)
   ```
-  Then remove the `~/.zshenv` symlink first if it points into `my-env`.
+  Then remove the `~/.zshenv` symlink first if it points into `nest`.
 
 ---
 
@@ -338,7 +338,7 @@ restart with `tmux kill-server` and reopen.
 - **Dotfile** — a settings file whose name starts with a dot, like `.zshrc`.
   The dot hides it from normal file listings. These hold your configuration.
 - **Symlink (symbolic link)** — a shortcut that points to a file somewhere
-  else. The installer uses these so your settings can live in `my-env` while
+  else. The installer uses these so your settings can live in `nest` while
   the system finds them in their usual spots.
 - **Package manager** — the tool that installs software on your system
   (Homebrew on macOS; apt, dnf, yum, or pacman on Linux). The installer detects
@@ -353,7 +353,7 @@ restart with `tmux kill-server` and reopen.
 ## For the curious: how the repository is organized
 
 ```
-my-env/
+nest/
 ├── install.sh                 # the one command you run; it calls the modules below
 ├── lib/
 │   └── common.sh              # shared helper code used by every module
@@ -363,11 +363,10 @@ my-env/
 │   ├── starship.sh            # the prompt and its settings
 │   ├── neovim.sh              # the editor and its settings
 │   └── tmux.sh                # tmux and its settings
-├── home/
-│   └── .zshenv                # ZDOTDIR stub     (linked to ~/.zshenv; points zsh at config/zsh)
 ├── config/
-│   ├── starship/starship.toml # prompt settings  (linked to ~/.config/starship/starship.toml)
+│   ├── zsh/zshenv             # ZDOTDIR stub     (linked to ~/.zshenv; points zsh at config/zsh)
 │   ├── zsh/.zshrc             # shell settings   (linked to ~/.config/zsh/.zshrc)
+│   ├── starship/starship.toml # prompt settings  (linked to ~/.config/starship/starship.toml)
 │   ├── nvim/                  # editor settings  (linked to ~/.config/nvim)
 │   └── tmux/                  # tmux framework + YOUR settings (linked to ~/.config/tmux)
 └── examples/

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# lib/common.sh — shared helpers for the my-env installer and its modules.
+# lib/common.sh — shared helpers for the nest installer and its modules.
 #
 # This file is SOURCED, never executed. Both install.sh and every
 # modules/*.sh source it to get logging, platform detection, package-manager
