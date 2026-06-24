@@ -1,378 +1,271 @@
 # nest
 
-This repository is a saved copy of a complete terminal and text-editor setup.
-Run one command on a new computer and it will look and behave exactly like the
-machine you set it up on: the same prompt, the same colors, the same editor,
-the same shortcuts.
+A portable terminal and editor setup. One command reconstitutes the same
+shell, prompt, colors, editor, and keybindings on a new machine.
 
-You do not need to understand every tool below to use it. Follow the numbered
-steps and it will work. If a word is unfamiliar, check the **Glossary** at the
-bottom.
+Everything is organized into five **modules** that can be installed together or
+individually: `tools`, `zsh`, `starship`, `neovim`, `tmux`.
 
----
-
-## What you are installing (in plain terms)
-
-| Thing | What it is, in one sentence |
+| Tool | Role |
 |---|---|
-| **zsh** | The program that runs when you type commands (a "shell"). It replaces the default one. |
-| **starship** | Makes the line you type commands on (the "prompt") informative and good-looking. |
-| **eza** | A nicer-looking replacement for the `ls` command that lists files. |
-| **fzf** | Lets you search your command history and files by typing a few letters. |
-| **nvm** | Installs and switches between versions of Node.js (only needed if you write JavaScript). |
-| **Nerd Font** | A font that includes little icons. The prompt and editor use these icons. |
-| **Neovim** | A keyboard-driven text editor (the command is `nvim`), set up for coding. |
-| **tmux** | Lets you split one terminal window into several panes and keep sessions running. |
-
-These are grouped into five **modules** you can install all at once or one at a
-time: `tools`, `zsh`, `starship`, `neovim`, `tmux`.
+| **zsh** | The shell. Replaces the system default. |
+| **starship** | Prompt: git/context-aware, fast. |
+| **eza** | Modern `ls` replacement. |
+| **fzf** | Fuzzy finder for history and files. |
+| **nvm** | Node version manager (only relevant if you write JS). |
+| **Nerd Font** | JetBrains Mono patched with icon glyphs; used by the prompt, statusline, and editor. |
+| **Neovim** | Editor (`nvim`), configured for coding (LSP, treesitter, completion). |
+| **tmux** | Terminal multiplexer (panes, persistent sessions). |
 
 ---
 
-## Before you start
+## Before you run the installer
 
-You need two things already on the computer:
+Work through this checklist first. The installer is idempotent and backs up
+anything it replaces, but two things need your attention up front: secrets and
+any existing shell config.
 
-1. **A terminal.** This is the app where you type commands.
-   - macOS: the built-in app is called **Terminal** (find it with Spotlight).
-     A nicer free option is **iTerm2**, **Ghostty**, or **WezTerm**.
-   - Linux: whatever terminal your system came with is fine.
+1. **Prerequisites.**
+   - A terminal (iTerm2 / Ghostty / WezTerm on macOS; anything on Linux).
+   - `git` (`git --version`). macOS: `xcode-select --install`. Debian/Ubuntu:
+     `sudo apt-get install -y git`.
+   - macOS only: Homebrew (`brew --version`; install from <https://brew.sh>).
 
-2. **`git`**, a tool for downloading code. Check if you have it by typing:
-   ```sh
-   git --version
-   ```
-   If you see a version number, you are set. If you see "command not found":
-   - macOS: run `xcode-select --install` and accept the popup.
-   - Ubuntu/Debian: run `sudo apt-get install -y git`.
+2. **Plan your secrets.** API keys and tokens are **not** stored in this repo.
+   They live in `~/.config/zsh/secrets.zsh` (`chmod 600`, gitignored, sourced at
+   the end of `.zshrc`). The installer seeds that file from
+   `examples/secrets.zsh.example` *only if it does not already exist*, and never
+   overwrites it.
+   - **Migrating from an existing setup?** If your current `~/.zshrc`,
+     `~/.zshenv`, or `~/.profile` exports keys, copy them into
+     `~/.config/zsh/secrets.zsh`. The installer backs those files up but does
+     **not** migrate their contents — any exported variables stop loading until
+     you move them. Do this before or immediately after Step 2; until then your
+     keys are absent from new shells.
+   - Never commit real secrets. `secrets.zsh` and `local.zsh` are gitignored;
+     keep real values out of `.zshrc` and the `examples/` templates.
 
-**macOS only — one extra tool:** this setup installs software using
-**Homebrew**, the standard macOS software installer. Check for it with:
-```sh
-brew --version
-```
-If that says "command not found", install Homebrew first by following the one
-command on <https://brew.sh>, then come back here.
+3. **Know what gets replaced.** Existing `~/.zshrc`, `~/.zshenv`, and
+   `~/.tmux.conf` are renamed to `*.backup.<date>` and replaced with symlinks
+   into this repo. Nothing is deleted. See **Is this safe?** below.
 
 ---
 
-## Install — step by step
-
-### Step 1 — Download this setup onto the computer
-
-Copy and paste this into your terminal. It puts the files in a folder called
-`nest` inside your home directory, then moves you into that folder.
+## Install
 
 ```sh
 git clone <your-repo-url> ~/nest
 cd ~/nest
+./install.sh            # detects the platform, installs what's missing, links configs
+exec zsh -l             # switch the current terminal to the new setup
 ```
 
-Replace `<your-repo-url>` with the address of your copy of this repository. If
-the files are already on the machine (for example you copied them by hand),
-just run `cd ~/nest`.
+`./install.sh` is safe to re-run: installed tools are skipped and existing
+files are backed up before linking. It may prompt for your password when
+installing system packages.
 
-### Step 2 — Run the installer
+Then:
 
-```sh
-./install.sh
-```
+4. **Fill in secrets.** Edit `~/.config/zsh/secrets.zsh` with your real keys (or
+   confirm the values you migrated in step 2). Run `exec zsh -l` to reload.
 
-That is the whole installation. The script figures out what kind of computer
-you are on, installs anything that is missing, and connects all the
-configuration files. It is safe to run more than once — if something is already
-installed, it is skipped, and your existing files are backed up before anything
-is changed (see **"Is this safe?"** below).
+5. **Select the font.** In your terminal's settings, set the font to
+   **JetBrainsMono Nerd Font** (the installer downloads it). Without this,
+   icons render as empty boxes; everything else still works.
 
-You may be asked for your password once or twice. That is normal: installing
-software sometimes needs permission.
+6. **First Neovim launch** (optional): `nvim`. Plugins and treesitter parsers
+   install on first run — one-time, takes a minute. Quit with `:q`.
 
-### Step 3 — Start your new shell
-
-```sh
-exec zsh -l
-```
-
-This switches your current terminal over to the new setup. You should
-immediately see the new prompt.
-
-On **macOS** you are done. Close and reopen your terminal and the new setup
-loads automatically every time.
-
-On **Linux**, read the short section **"Logging in over SSH"** below — there is
-one extra thing to know.
-
-### Step 4 (one time) — Turn on the icon font
-
-The prompt and editor use a special font with built-in icons. The installer
-downloads it, but you have to tell your terminal app to use it. This is a
-setting in your terminal, changed with the mouse, not a command:
-
-- Open your terminal app's **Settings / Preferences**.
-- Find the **Font** option.
-- Choose **"JetBrainsMono Nerd Font"**.
-
-If you skip this, everything still works — you will just see small empty boxes
-where icons should be.
-
-### Step 5 (optional) — Open the editor for the first time
-
-```sh
-nvim
-```
-
-The first time you open Neovim it downloads its add-ons and may take a minute.
-This is normal and only happens once. To quit Neovim, type `:q` and press
-Enter.
+On macOS you're done; new terminals load the setup automatically. On Linux, see
+**Logging in over SSH**.
 
 ---
 
-## Installing just one piece
+## Installing a single module
 
-You do not have to install everything. Each module is its own small script you
-can run by itself. For example:
-
-```sh
-./modules/neovim.sh        # set up only the editor
-./modules/tmux.sh          # set up only tmux
-./modules/zsh.sh           # set up only the shell
-```
-
-Or use the main installer with options:
+Each module is a standalone script:
 
 ```sh
-./install.sh --list                 # show the list of module names
-./install.sh --dry-run              # show what WOULD happen, change nothing
-./install.sh --only zsh,neovim      # install only these two
-./install.sh --skip tmux            # install everything except tmux
-./install.sh --help                 # show all options
+./modules/neovim.sh
+./modules/tmux.sh
+./modules/zsh.sh
 ```
 
-`--dry-run` is a good way to see what the installer plans to do before letting
-it do anything.
+Or drive the orchestrator:
+
+```sh
+./install.sh --list                 # module names
+./install.sh --dry-run              # show the plan, change nothing
+./install.sh --only zsh,neovim      # only these
+./install.sh --skip tmux            # everything except tmux
+./install.sh --help
+```
 
 ---
 
-## Is this safe? (What the installer does to your files)
+## Is this safe?
 
-Yes, and here is exactly how it avoids surprises:
-
-- **It never deletes your existing settings.** If you already have a file like
-  `~/.zshrc` or `~/.zshenv`, the installer first renames it to
-  `<name>.backup.<date>` so you can get it back, then puts the new one in place.
-- **It does not copy files; it links them.** Your settings live in this
-  `nest` folder. The installer creates a "symlink" (a shortcut) from the
-  place each tool looks (e.g. `~/.config/zsh/.zshrc`) back to the file in
-  `nest`. This
-  means when you edit a setting later, you edit it in one place and it is
-  already saved with the rest of your setup.
-- **It skips anything already installed**, so re-running it is cheap and safe.
-- **It never touches your private keys.** See the next section.
+- **Existing settings are backed up, never deleted.** A pre-existing `~/.zshrc`
+  / `~/.zshenv` is renamed to `*.backup.<date>` before the new one is linked.
+- **Configs are linked, not copied.** Your settings live in this repo; the
+  installer symlinks each tool's expected path (e.g. `~/.config/zsh/.zshrc`)
+  back to the file here. Editing once updates the live setup.
+- **Installed tools are skipped**, so re-running is cheap.
+- **Private keys are never touched or committed.** See **Secrets**, above, and
+  the wiring table below.
 
 ---
 
-## How your settings are wired up (the flow)
+## How your settings are wired up
 
-Every configuration file lives in this `nest` folder. The installer creates a
-symlink from the place each tool looks, back to the file here. Most tools read
-from an obvious location; two need a small redirect, explained below.
+Every config file lives in this repo and is symlinked into place. Most tools
+read from an obvious location; zsh and starship need a small redirect.
 
-| File in this repo | Symlinked to | How the tool finds it |
+| Repo file | Symlinked to | How the tool finds it |
 |---|---|---|
-| `config/zsh/zshenv` | `~/.zshenv` | zsh **always** reads `~/.zshenv` first; this stub sets `ZDOTDIR=~/.config/zsh` so the rest of the shell config is found there |
-| `config/zsh/.zshrc` | `~/.config/zsh/.zshrc` | zsh reads `$ZDOTDIR/.zshrc` (i.e. this file) once `ZDOTDIR` is set above |
-| `config/starship/starship.toml` | `~/.config/starship/starship.toml` | `.zshrc` exports `STARSHIP_CONFIG` pointing at this path |
-| `config/nvim/` | `~/.config/nvim` | Neovim's standard config directory |
-| `config/tmux/tmux.conf` | `~/.config/tmux/tmux.conf` | tmux >= 3.1 reads this XDG path automatically |
-| `config/tmux/tmux.conf.local` | `~/.config/tmux/tmux.conf.local` | the oh-my-tmux framework derives this from `tmux.conf`'s own path |
+| `config/zsh/zshenv` | `~/.zshenv` | zsh always reads `~/.zshenv` first; this stub sets `ZDOTDIR=~/.config/zsh` |
+| `config/zsh/.zshrc` | `~/.config/zsh/.zshrc` | zsh reads `$ZDOTDIR/.zshrc` once `ZDOTDIR` is set |
+| `config/starship/starship.toml` | `~/.config/starship/starship.toml` | `.zshrc` exports `STARSHIP_CONFIG` pointing here |
+| `config/nvim/` | `~/.config/nvim` | Neovim's standard config dir |
+| `config/tmux/tmux.conf` | `~/.config/tmux/tmux.conf` | tmux >= 3.1 reads this XDG path |
+| `config/tmux/tmux.conf.local` | `~/.config/tmux/tmux.conf.local` | oh-my-tmux derives this from `tmux.conf`'s path |
 
-Two private files are **not** symlinked and **not** in this repo — they are real
-files the installer seeds into `~/.config/zsh/` and never overwrites:
+Two private files are real (not symlinks) and not in the repo. The installer
+seeds them from `examples/` and never overwrites them:
 
 | File | Purpose |
 |---|---|
-| `~/.config/zsh/secrets.zsh` | API keys and tokens; `chmod 600`; sourced at the end of `.zshrc` |
+| `~/.config/zsh/secrets.zsh` | API keys / tokens; `chmod 600`; sourced at the end of `.zshrc` |
 | `~/.config/zsh/local.zsh` | per-machine tweaks; sourced at the end of `.zshrc` |
 
-**The zsh startup order** (why the `~/.zshenv` redirect is needed): zsh has no
-automatic support for an XDG config directory — left alone it reads `~/.zshrc`
-from your home folder. The only file it guarantees to read first is `~/.zshenv`.
-So the flow is:
+zsh has no XDG auto-discovery — left alone it reads `~/.zshrc` from `$HOME`. The
+only file it reliably reads first is `~/.zshenv`, so the stub there redirects
+everything else under `~/.config/zsh/`:
 
 ```
-~/.zshenv            -> sets ZDOTDIR=~/.config/zsh
-  $ZDOTDIR/.zshrc    -> the real shell config (aliases, plugins, prompt)
-    secrets.zsh      -> your private keys   (sourced near the end)
-    local.zsh        -> per-machine tweaks  (sourced near the end)
+~/.zshenv            sets ZDOTDIR=~/.config/zsh
+  $ZDOTDIR/.zshrc    shell config (aliases, plugins, prompt)
+    secrets.zsh      private keys      (sourced near the end)
+    local.zsh        per-machine tweaks (sourced near the end)
 ```
 
-The payoff: everything zsh-related lives together under `~/.config/zsh/`, and
-every tool is a uniform `config/<tool>/` folder in this repo — the only file
-that must sit directly in your home folder is the one-line `~/.zshenv` stub.
+The result: everything zsh-related is under `~/.config/zsh/`, every tool is a
+uniform `config/<tool>/` directory, and the one-line `~/.zshenv` stub is the
+only thing that must sit in `$HOME`.
 
 ---
 
-## Where to put your own customizations
+## Customizing
 
-Three kinds of changes, three places:
-
-| You want to... | Edit this file | Shared across machines? |
+| Goal | Edit | Versioned? |
 |---|---|---|
-| Add a shortcut you want on **every** computer | the `>>> YOUR ALIASES <<<` block in `config/zsh/.zshrc` | Yes (saved in this repo) |
-| Add an API key or password | `~/.config/zsh/secrets.zsh` | **No** — kept private, never uploaded |
-| Add something for **this one** computer only | `~/.config/zsh/local.zsh` | **No** |
-| Change tmux (keys, colors, status bar) | `config/tmux/tmux.conf.local` | Yes (saved in this repo) |
-
-The installer creates the two private files for you from examples in the
-`examples/` folder, and never overwrites them once they exist. Your real
-secrets stay on your machine and are kept out of this repository on purpose.
-
-(An "alias" is just a short name for a longer command — for example, making
-`ll` mean "list files in detail".)
+| Alias/function for **every** machine | `>>> YOUR ALIASES <<<` block in `config/zsh/.zshrc` | Yes |
+| API key or token | `~/.config/zsh/secrets.zsh` | No (private) |
+| **This machine only** (PATH, env, aliases) | `~/.config/zsh/local.zsh` | No (private) |
+| tmux keys/colors/status bar | `config/tmux/tmux.conf.local` | Yes |
 
 ---
 
 ## Logging in over SSH (Linux servers)
 
-Skip this if you only use your own laptop.
-
-When you connect to a Linux server with `ssh`, it usually starts the old shell
-(bash), not zsh. The installer handles this for you automatically: the next
-time you log in, it switches you into zsh by itself. You do not need to do
-anything.
-
-If you would rather make zsh the permanent default on that server, run:
+Skip if you only use your laptop. SSH into a Linux box usually starts bash, not
+zsh. The installer adds a guarded hook to `~/.bashrc` that hands interactive
+logins to zsh automatically. To make zsh the login shell permanently instead:
 
 ```sh
 ./install.sh --chsh
 ```
 
-One more thing: the icons in the prompt are drawn by the terminal app **on your
-laptop**, using your laptop's font (from Step 4). So you only need to set the
-Nerd Font on your own computer, not on every server you connect to.
+Prompt/statusline icons are drawn by the terminal on your *laptop* using its
+font, so you only set the Nerd Font locally — never on the servers.
 
 ---
 
-## Updating later
-
-To pull in newer settings or tools, just run the installer again:
+## Updating
 
 ```sh
 cd ~/nest
 ./install.sh
 ```
 
-Because everything is linked rather than copied, editing a file in `nest`
-updates your live setup right away — no reinstall needed for your own tweaks.
+Because configs are linked, editing a file in `nest` updates the live setup
+immediately — no reinstall needed for your own tweaks.
 
 ---
 
-## The tmux setup (split panes + status bar)
+## tmux
 
-tmux lets you split one window into panes and keep work running after you close
-the terminal. This setup uses **oh-my-tmux**, a popular ready-made tmux config,
-with a few personal tweaks and a status bar colored to match the Neovim theme.
+Uses **oh-my-tmux** with local customizations and a Nord status bar. Two files:
 
-It is two files, and the split matters:
+- `config/tmux/tmux.conf` — the oh-my-tmux framework, vendored unchanged from a
+  pinned commit. **Do not edit.**
+- `config/tmux/tmux.conf.local` — your settings (prefix, splits, mouse, colors,
+  status bar). Edit this, then `prefix r` to reload a running session.
 
-- `config/tmux/tmux.conf` — the oh-my-tmux framework itself. It is downloaded
-  unchanged from the project (pinned to a specific version). **Do not edit
-  it.**
-- `config/tmux/tmux.conf.local` — **your** settings. This is the single source of
-  truth: prefix key, splits, mouse, colors, and the status bar all live here.
-  Edit this file and run `./install.sh` (or just `./modules/tmux.sh`).
+Customizations:
 
-What the tweaks give you:
-
-- Prefix key is `Ctrl-a` (instead of the default `Ctrl-b`).
-- Split side-by-side with `prefix |`, stacked with `prefix -`.
+- Prefix `Ctrl-a`; split with `prefix |` (horizontal) and `prefix -` (vertical).
 - Mouse on, 10,000-line scrollback.
-- A Nord-colored status bar showing the session name on the left and the time,
-  date, and `user@host` on the right (the `user@host` makes it obvious which
-  machine you are on when you SSH around).
-- Copy in tmux also copies to your system clipboard.
+- Nord status bar: session name left; battery, time, date, and an SSH-aware
+  `user@host` right (the host follows you into ssh sessions).
+- Copy in tmux also copies to the system clipboard.
 
-To apply changes to a **running** tmux, press `prefix r` (reload), or fully
-restart with `tmux kill-server` and reopen.
-
-> **A note on Pi.** If you use the Pi coding agent, it launches its own tmux
-> sessions. This config is intentionally compatible with that: it keeps the
-> `extended-keys` settings Pi needs for `Shift+Enter` / `Ctrl+Enter`, and it
-> turns off oh-my-tmux's automatic plugin updates so launching a session stays
-> fast. Pi's sessions automatically use this same config because tmux >= 3.1
-> reads it from the XDG location `~/.config/tmux/tmux.conf`.
+> **Pi compatibility.** If you use the Pi coding agent, it launches its own tmux
+> sessions against this config. It keeps the `extended-keys` settings Pi needs
+> for `Shift+Enter` / `Ctrl+Enter` and disables oh-my-tmux's automatic plugin
+> updates so session launch stays fast. Pi picks this config up automatically
+> because tmux >= 3.1 reads the XDG path `~/.config/tmux/tmux.conf`.
 
 ---
 
-## If something goes wrong
+## Troubleshooting
 
-- **I see empty boxes instead of icons.** The Nerd Font is not selected in your
-  terminal. Redo Step 4.
-- **The prompt looks plain / no colors.** `starship` may not have installed.
-  Re-run `./modules/starship.sh` and read any warnings it prints.
-- **Neovim shows errors on startup.** The config needs Neovim version 0.12 or
-  newer. Check your version with `nvim --version`. On Linux the version from
-  the system installer is often too old; download a newer build from
+- **Empty boxes instead of icons** — Nerd Font not selected in the terminal
+  (Step 5).
+- **Plain prompt, no colors** — starship didn't install. Re-run
+  `./modules/starship.sh` and read the warnings.
+- **`command not found` for nvim/brew/eza in a fresh login** — the shell isn't
+  finding Homebrew. `.zshrc` bootstraps `brew shellenv`; confirm brew is
+  installed and re-run `exec zsh -l`.
+- **Neovim errors on startup** — needs Neovim >= 0.12 (`nvim --version`). Distro
+  builds are often too old; use a release from
   <https://github.com/neovim/neovim/releases>.
-- **The tmux status bar shows boxes or `<E0B0>` instead of arrows.** That is
-  the Nerd Font again — set it in your terminal (Step 4). The arrows are
-  Powerline icons that the font provides.
-- **I want my old setup back.** Your previous files were saved next to the new
-  ones with a `.backup.<date>` ending. For example, to restore a former shell
-  config and its environment file:
+- **tmux status bar shows boxes / `<E0B0>`** — Nerd Font again (Step 5); those
+  are Powerline glyphs.
+- **`prefix r` says "no such file"** — a tmux server started before this config
+  was installed. Run `tmux source-file ~/.config/tmux/tmux.conf` once, or
+  `tmux kill-server` and reopen.
+- **Restore a previous setup** — backups sit next to the originals:
   ```sh
-  mv ~/.zshrc.backup.20260624153000  ~/.zshrc     # use your actual backup name
-  mv ~/.zshenv.backup.20260624153000 ~/.zshenv    # (this one may hold old keys)
+  rm ~/.zshenv                                    # remove the symlink first
+  mv ~/.zshrc.backup.<date>  ~/.zshrc
+  mv ~/.zshenv.backup.<date> ~/.zshenv            # may hold old keys
   ```
-  Then remove the `~/.zshenv` symlink first if it points into `nest`.
 
 ---
 
-## Glossary
-
-- **Terminal** — the app where you type commands.
-- **Shell** — the program inside the terminal that reads and runs your commands
-  (here, zsh).
-- **Prompt** — the text at the start of the line where you type, e.g. the part
-  that shows the current folder.
-- **Dotfile** — a settings file whose name starts with a dot, like `.zshrc`.
-  The dot hides it from normal file listings. These hold your configuration.
-- **Symlink (symbolic link)** — a shortcut that points to a file somewhere
-  else. The installer uses these so your settings can live in `nest` while
-  the system finds them in their usual spots.
-- **Package manager** — the tool that installs software on your system
-  (Homebrew on macOS; apt, dnf, yum, or pacman on Linux). The installer detects
-  which one you have and uses it.
-- **Module** — one of the five installable pieces of this setup: `tools`,
-  `zsh`, `starship`, `neovim`, `tmux`.
-- **SSH** — a way to log in to another computer (usually a server) over the
-  network from your terminal.
-
----
-
-## For the curious: how the repository is organized
+## Repository layout
 
 ```
 nest/
-├── install.sh                 # the one command you run; it calls the modules below
+├── install.sh                 # orchestrator; runs the modules in dependency order
 ├── lib/
-│   └── common.sh              # shared helper code used by every module
+│   └── common.sh              # shared helpers (logging, platform detection, link_file)
 ├── modules/
-│   ├── tools.sh               # eza, fzf, nvm, and the Nerd Font
-│   ├── zsh.sh                 # the shell, its add-ons, and config/zsh/.zshrc
-│   ├── starship.sh            # the prompt and its settings
-│   ├── neovim.sh              # the editor and its settings
-│   └── tmux.sh                # tmux and its settings
+│   ├── tools.sh               # eza, fzf, nvm, Nerd Font
+│   ├── zsh.sh                 # shell, plugins, config/zsh/.zshrc
+│   ├── starship.sh            # prompt
+│   ├── neovim.sh              # editor
+│   └── tmux.sh                # tmux
 ├── config/
-│   ├── zsh/zshenv             # ZDOTDIR stub     (linked to ~/.zshenv; points zsh at config/zsh)
-│   ├── zsh/.zshrc             # shell settings   (linked to ~/.config/zsh/.zshrc)
-│   ├── starship/starship.toml # prompt settings  (linked to ~/.config/starship/starship.toml)
-│   ├── nvim/                  # editor settings  (linked to ~/.config/nvim)
-│   └── tmux/                  # tmux framework + YOUR settings (linked to ~/.config/tmux)
+│   ├── zsh/zshenv             # ZDOTDIR stub      (-> ~/.zshenv)
+│   ├── zsh/.zshrc             # shell config      (-> ~/.config/zsh/.zshrc)
+│   ├── starship/starship.toml # prompt            (-> ~/.config/starship/starship.toml)
+│   ├── nvim/                  # editor            (-> ~/.config/nvim)
+│   └── tmux/                  # framework + local (-> ~/.config/tmux)
 └── examples/
-    └── *.example              # templates for your private secrets/local files
+    └── *.example              # templates for the private secrets/local files
 ```
 
-The modules always run in a sensible order (`tools`, then `zsh`, `starship`,
-`neovim`, `tmux`) no matter how you ask for them, because some pieces depend on
-others being in place first.
+Modules always run in order (`tools`, `zsh`, `starship`, `neovim`, `tmux`)
+regardless of how they're requested, since later ones depend on earlier ones.
