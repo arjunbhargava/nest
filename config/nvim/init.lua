@@ -81,6 +81,19 @@ require('nordic').setup({
   reduced_blue = true,        -- false for a bluer, more classic Nord look
   transparent = { bg = true, float = false },  -- use the terminal background
 })
+-- nordic leaves the diff highlight groups empty (DiffChange cleared, others
+-- bold-only with no background), so diff mode / diffview show no line
+-- highlighting. Define dark-tinted backgrounds that read on nordic's bg.
+-- Re-applied on every ColorScheme so it survives reloads.
+vim.api.nvim_create_autocmd('ColorScheme', {
+  pattern = 'nordic',
+  callback = function()
+    vim.api.nvim_set_hl(0, 'DiffAdd',    { bg = '#2F3D2A' })               -- added line
+    vim.api.nvim_set_hl(0, 'DiffDelete', { bg = '#3D2A2A', fg = '#6B5560' }) -- removed line
+    vim.api.nvim_set_hl(0, 'DiffChange', { bg = '#2C3440' })               -- changed line
+    vim.api.nvim_set_hl(0, 'DiffText',   { bg = '#3E5066' })               -- changed chars
+  end,
+})
 vim.cmd.colorscheme('nordic')
 
 -- Bottom bar (statusline). Uses nordic's lualine theme.
@@ -147,7 +160,19 @@ require('which-key').setup({})
 -- pane shows the diff in native diff mode (live as you edit; the file list
 -- refreshes on save / :DiffviewRefresh). The main tool for tracking what an
 -- agent changed across the tree.
-require('diffview').setup({})
+-- enhanced_diff_hl: distinct add/change/delete colors (off by default).
+-- nvim's own diffopt already provides char-level inline highlighting
+-- (inline:char) and line matching (linematch:40); histogram gives cleaner
+-- diffs than the default Myers algorithm. diffopt is global, so it also
+-- improves :diffthis and <leader>hd.
+vim.opt.diffopt:append('algorithm:histogram')
+require('diffview').setup({
+  enhanced_diff_hl = true,
+  view = {
+    default = { winbar_info = true },       -- show revision label in the winbar
+    file_history = { winbar_info = true },
+  },
+})
 local function diffview_toggle()
   if require('diffview.lib').get_current_view() then
     vim.cmd('DiffviewClose')
